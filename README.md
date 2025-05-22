@@ -1,1 +1,7 @@
 # Rayfun
+
+Run:
+
+```
+dotnet run
+```

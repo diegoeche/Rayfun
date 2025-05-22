@@ -1,0 +1,15 @@
+{
+  "version": 2,
+  "dgSpecHash": "uuKM6iZPvY8=",
+  "success": true,
+  "projectFilePath": "/home/diegoeche/Dev/Personal/RaylibGame/Rayfun/Rayfun.csproj",
+  "expectedPackageFiles": [
+    "/home/diegoeche/.nuget/packages/imgui.net/1.91.6.1/imgui.net.1.91.6.1.nupkg.sha512",
+    "/home/diegoeche/.nuget/packages/raylib-cs/7.0.1/raylib-cs.7.0.1.nupkg.sha512",
+    "/home/diegoeche/.nuget/packages/rlimgui-cs/3.1.0/rlimgui-cs.3.1.0.nupkg.sha512",
+    "/home/diegoeche/.nuget/packages/system.buffers/4.5.1/system.buffers.4.5.1.nupkg.sha512",
+    "/home/diegoeche/.nuget/packages/system.numerics.vectors/4.5.0/system.numerics.vectors.4.5.0.nupkg.sha512",
+    "/home/diegoeche/.nuget/packages/system.runtime.compilerservices.unsafe/6.0.0/system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

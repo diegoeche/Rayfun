@@ -41,34 +41,38 @@ namespace Editor {
 	    }
 	    else
 	    {
-		for (int i = 0; i < _files.Count; i++)
-		{
-		    string filename = Path.GetFileName(_files[i]);
-		    bool selected = i == _selectedIndex;
-
-		    if (ImGui.Selectable(filename, selected))
-		    {
-			_selectedIndex = i;
-		    }
-
-		    if (ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-		    {
-			if (_previewTexture.HasValue)
-			{
-			    Raylib.UnloadTexture(_previewTexture.Value);
-			}
-
-			_previewPath = _files[i];
-			_previewTexture = Raylib.LoadTexture(_previewPath);
-		    }
-		    RenderPreview();
-		}
+                RenderFiles();
+                RenderPreview();
 	    }
 
 	    ImGui.End();
 	}
+        private void RenderFiles() {
+	    for (int i = 0; i < _files.Count; i++)
+	    {
+		string filename = Path.GetFileName(_files[i]);
+		bool selected = i == _selectedIndex;
 
-	public void RenderPreview()
+		if (ImGui.Selectable(filename, selected))
+		{
+		    _selectedIndex = i;
+		}
+
+		if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+		{
+		    if (_previewTexture.HasValue)
+		    {
+			Raylib.UnloadTexture(_previewTexture.Value);
+		    }
+
+		    _previewPath = _files[i];
+		    _previewTexture = Raylib.LoadTexture(_previewPath);
+		}
+	    }
+
+	}
+
+        public void RenderPreview()
 	{
 	    if (_previewTexture == null)
 		return;

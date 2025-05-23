@@ -19,20 +19,28 @@ namespace rlImGui_cs
 
 	    // Texture2D myTexture = Raylib.LoadTexture("assets/assets.png");
 	    var assetBrowser = new AssetBrowser();
+	    var uiManager = new UIManager();
+	    var statsOverlay = new StatsOverlay();
 
 	    while (!Raylib.WindowShouldClose())
             {
+		statsOverlay.RecordFrame(Raylib.GetFrameTime());
+		uiManager.HandleShortcuts();
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Color.Beige);
-
 		// Raylib.DrawTexture(myTexture, 100, 100, Color.White);
-                rlImGui.Begin();
+		rlImGui.Begin();
 
-		assetBrowser.Render();
+		if (uiManager.ShowEditor) {
+		    assetBrowser.Render();
+		}
+		if (uiManager.ShowStats) {
+		    statsOverlay.Render();
+		}
 
-                rlImGui.End();
+		rlImGui.End();
 
-                Raylib.EndDrawing();
+		Raylib.EndDrawing();
             }
 
             rlImGui.Shutdown();

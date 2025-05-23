@@ -2,7 +2,6 @@ using ImGuiNET;
 using System.Collections.Generic;
 using Raylib_cs;
 using rlImGui_cs;
-using ImGuiNET;
 using System.Numerics;
 
 namespace Editor

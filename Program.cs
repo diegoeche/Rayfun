@@ -18,7 +18,7 @@ namespace rlImGui_cs
             rlImGui.Setup(true);
 
 	    // Texture2D myTexture = Raylib.LoadTexture("assets/assets.png");
-	    var assetBrowser = new AssetBrowser();
+	    var textureExplorer = new TextureExplorer();
 	    var uiManager = new UIManager();
 	    var statsOverlay = new StatsOverlay();
 
@@ -32,7 +32,7 @@ namespace rlImGui_cs
 		rlImGui.Begin();
 
 		if (uiManager.ShowEditor) {
-		    assetBrowser.Render();
+		    textureExplorer.Render();
 		}
 		if (uiManager.ShowStats) {
 		    statsOverlay.Render();

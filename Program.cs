@@ -14,7 +14,6 @@ namespace rlImGui_cs
             Raylib.SetConfigFlags(ConfigFlags.Msaa4xHint | ConfigFlags.VSyncHint | ConfigFlags.ResizableWindow);
             Raylib.InitWindow(1280, 800, "Map Editor");
             Raylib.SetTargetFPS(144);
-
             rlImGui.Setup(true);
 
 	    // Texture2D myTexture = Raylib.LoadTexture("assets/assets.png");
@@ -26,6 +25,7 @@ namespace rlImGui_cs
             {
 		statsOverlay.RecordFrame(Raylib.GetFrameTime());
 		uiManager.HandleShortcuts();
+		textureExplorer.HandleInput();
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Color.Beige);
 		// Raylib.DrawTexture(myTexture, 100, 100, Color.White);

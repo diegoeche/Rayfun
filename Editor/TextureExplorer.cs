@@ -41,6 +41,9 @@ namespace Editor
             ImGui.End();
         }
 
+        public void HandleInput() {
+        }
+
         private void RenderFiles()
         {
             for (int i = 0; i < _files.Count; i++)

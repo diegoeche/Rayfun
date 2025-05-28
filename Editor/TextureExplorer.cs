@@ -12,7 +12,8 @@ namespace Editor
         private string _folderPath = "assets";
         private List<string> _files = new();
         private int _selectedIndex = -1;
-        private TexturePreview _preview = new TexturePreview();
+        private TexturePreview _texturePreview = new TexturePreview();
+        private AtlasExplorer _atlasExplorer = new AtlasExplorer();
 
         public TextureExplorer()
         {
@@ -26,7 +27,7 @@ namespace Editor
 
         public void Render()
         {
-            ImGui.Begin("Texture Explorer");
+            ImGui.Begin("File Explorer");
 
             if (_files.Count == 0)
             {
@@ -35,7 +36,8 @@ namespace Editor
             else
             {
                 RenderFiles();
-                _preview.Render();
+                _texturePreview.Render();
+                _atlasExplorer.Render();
             }
 
             ImGui.End();
@@ -56,10 +58,19 @@ namespace Editor
                     _selectedIndex = i;
                 }
 
-                if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
-                {
-                    _preview.Load(_files[i]);
-                }
+
+		if (ImGui.IsItemHovered() && ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left))
+		{
+		    string lower = _files[i].ToLower();
+		    if (lower.EndsWith(".png") || lower.EndsWith(".jpg"))
+		    {
+			_texturePreview.Load(_files[i]);
+		    }
+		    else if (lower.EndsWith(".atlas.json"))
+		    {
+			_atlasExplorer.Load(_files[i]);
+		    }
+		}
             }
         }
     }

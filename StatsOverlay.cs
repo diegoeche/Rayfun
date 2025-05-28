@@ -20,12 +20,8 @@ public class StatsOverlay
         ImGui.Begin(
 	    "Stats",
 	    ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoDecoration |
-	    ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav |
-	    ImGuiWindowFlags.NoMove
+	    ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoNav
 	);
-
-        // Position top-left
-        ImGui.SetWindowPos(new Vector2(10, 10), ImGuiCond.Always);
 
         ImGui.Text($"FPS: {Raylib.GetFPS()}");
         ImGui.PlotLines("Frame Time (ms)", ref _frameTimes[0], MaxSamples, _index,

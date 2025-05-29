@@ -58,23 +58,29 @@ namespace rlImGui_cs
                 Raylib.BeginDrawing();
                 Raylib.ClearBackground(Color.Beige);
 
-                // MapRenderer.Render(
-                Camera3D camera = new Camera3D
+		var centerX = 10;
+		var centerY = 10;
+		var centerZ = 0;
+
+		Camera3D camera = new Camera3D
 		{
-		    Position = new Vector3(10, 10, 10),
-		    Target = new Vector3(0, 0, 0),
+		    Position = new Vector3(centerX + 20, centerZ + 20, centerY + 20),
+		    Target = new Vector3(centerX, centerZ, centerY),
 		    Up = new Vector3(0, 1, 0),
 		    FovY = 45.0f,
 		    Projection = CameraProjection.Perspective
 		};
 
-
 		Raylib.BeginMode3D(camera);
-		Game.MapRenderer.Render3D(map);
+		MapRenderer.Render3D(map, centerX, centerY, centerZ, 10, 1f);
 		Raylib.EndMode3D();
 
+		Raylib.BeginMode3D(camera);
 
-		MapRenderer.Render3D(map);
+		MapRenderer.Render3D(map, 10, 10, 10, 40, 1f);
+
+		Raylib.EndMode3D();
+
                 rlImGui.Begin();
 
 		if (uiManager.ShowEditor) {

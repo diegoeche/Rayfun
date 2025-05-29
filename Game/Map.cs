@@ -77,23 +77,36 @@ namespace Game
             }
         }
 
-        public static void Render3D(IMap map)
+	public static void Render3D(IMap map, int centerX, int centerY, int centerZ, int radius, float cubeSize)
         {
-            foreach (var (pos, voxel) in map.Enumerate())
+            for (int dz = 0; dz <= centerZ + 5; dz++)
             {
-                Color color;
-                if (voxel.Type == "grass")
-                    color = Color.Green;
-                else if (voxel.Type == "dirt")
-                    color = new Color(139, 69, 19, 255);
-                else if (voxel.Type == "water")
-                    color = Color.Blue;
-                else
-                    color = Color.Gray;
+                for (int dy = -radius; dy <= radius; dy++)
+                {
+                    for (int dx = -radius; dx <= radius; dx++)
+                    {
+                        int x = centerX + dx;
+                        int y = centerY + dy;
+                        int z = dz;
 
-                var cubePos = new Vector3(pos.x, pos.z, pos.y); // flip y/z for top-down
-                Raylib.DrawCube(cubePos, 1f, 1f, 1f, color);
-                Raylib.DrawCubeWires(cubePos, 1f, 1f, 1f, Color.DarkGray);
+                        var voxel = map.Get(x, y, z);
+                        if (voxel == null) continue;
+
+                        Color color;
+                        if (voxel.Type == "grass")
+                            color = Color.Green;
+                        else if (voxel.Type == "dirt")
+                            color = new Color(139, 69, 19, 255);
+                        else if (voxel.Type == "water")
+                            color = Color.Blue;
+                        else
+                            color = Color.Gray;
+
+                        var cubePos = new Vector3(x * cubeSize, z * cubeSize, y * cubeSize);
+                        Raylib.DrawCube(cubePos, cubeSize, cubeSize, cubeSize, color);
+                        Raylib.DrawCubeWires(cubePos, cubeSize, cubeSize, cubeSize, Color.DarkGray);
+                    }
+                }
             }
         }
     }

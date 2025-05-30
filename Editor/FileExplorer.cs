@@ -7,15 +7,16 @@ using System.Numerics;
 
 namespace Editor
 {
-    public class TextureExplorer
+    public class FileExplorer
     {
         private string _folderPath = "assets";
         private List<string> _files = new();
         private int _selectedIndex = -1;
         private TexturePreview _texturePreview = new TexturePreview();
         private AtlasExplorer _atlasExplorer = new AtlasExplorer();
+        private string _filter = "";
 
-        public TextureExplorer()
+        public FileExplorer()
         {
             if (Directory.Exists(_folderPath))
             {
@@ -35,6 +36,7 @@ namespace Editor
             }
             else
             {
+		ImGui.InputText("Filter", ref _filter, 64);
                 RenderFiles();
                 _texturePreview.Render();
                 _atlasExplorer.Render();
@@ -43,7 +45,21 @@ namespace Editor
             ImGui.End();
         }
 
-        public void HandleInput() {
+
+	private string GetIconForFile(string path)
+	{
+	    string lower = path.ToLower();
+
+	    if (lower.EndsWith(".png") || lower.EndsWith(".jpg") || lower.EndsWith(".jpeg"))
+                return IconFonts.FontAwesome6.Image;
+            if (lower.EndsWith(".atlas.json"))
+                return IconFonts.FontAwesome6.PuzzlePiece;
+            if (lower.EndsWith(".json"))
+                return IconFonts.FontAwesome6.File;
+            if (lower.EndsWith(".mp3") || lower.EndsWith(".wav"))
+                return IconFonts.FontAwesome6.Music;
+
+            return "";
         }
 
         private void RenderFiles()
@@ -52,8 +68,16 @@ namespace Editor
             {
                 string filename = Path.GetFileName(_files[i]);
                 bool selected = i == _selectedIndex;
+		if (!string.IsNullOrWhiteSpace(_filter) &&
+		    !filename.Contains(_filter, StringComparison.OrdinalIgnoreCase))
+		{
+		    continue;
+		}
 
-                if (ImGui.Selectable(filename, selected))
+		string icon = GetIconForFile(filename);
+                // Combine icon and name with spacing
+                string display = $"{icon}  {filename}";
+                if (ImGui.Selectable(display, selected))
                 {
                     _selectedIndex = i;
                 }

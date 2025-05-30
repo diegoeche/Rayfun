@@ -6,99 +6,100 @@ using ImGuiNET;
 using Editor;
 using Game;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
-namespace rlImGui_cs
+class Program
 {
-    class Program
+    static void Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            Raylib.SetConfigFlags(ConfigFlags.Msaa4xHint | ConfigFlags.VSyncHint | ConfigFlags.ResizableWindow);
-            Raylib.InitWindow(1280, 800, "Map Editor");
-            Raylib.SetTargetFPS(144);
-            rlImGui.Setup(true);
+	Raylib.SetConfigFlags(ConfigFlags.Msaa4xHint | ConfigFlags.VSyncHint | ConfigFlags.ResizableWindow);
+	Raylib.InitWindow(1280, 800, "Map Editor");
+	Raylib.SetTargetFPS(144);
+	rlImGui.Setup(true);
+        // var font = SetupIcons();
+        // rlImGui.ReloadFonts();
 
-	    // Texture2D myTexture = Raylib.LoadTexture("assets/assets.png");
-	    var textureExplorer = new TextureExplorer();
-	    var uiManager = new UIManager();
-	    var statsOverlay = new StatsOverlay();
-            var atlasExplorer = new AtlasExplorer();
-            var map = new SparseMap();
+        // Texture2D myTexture = Raylib.LoadTexture("assets/assets.png");
+        var fileExplorer = new FileExplorer();
+        var uiManager = new UIManager();
+	var statsOverlay = new StatsOverlay();
+	var atlasExplorer = new AtlasExplorer();
+	var map = InitializeDummyMap();
 
-            // Fill a small area with test voxels
-            var radius = 100;
-            for (int x = -radius; x <= radius; x++)
-	    {
-		for (int y = -radius; y <= radius; y++)
-		{
-		    string type;
-		    int mod = (x + y) % 3;
-		    if (mod == 0)
-			type = "grass";
-		    else if (mod == 1)
-			type = "dirt";
-		    else
-			type = "water";
+	while (!Raylib.WindowShouldClose())
+	{
+	    statsOverlay.RecordFrame(Raylib.GetFrameTime());
+	    uiManager.HandleShortcuts();
 
-		    map.Set(x, y, 0, new Voxel(type));
-		}
+	    Raylib.BeginDrawing();
+	    Raylib.ClearBackground(Color.Beige);
+
+	    RenderMap(map);
+
+	    rlImGui.Begin();
+	    // ImGui.ShowMetricsWindow();
+
+            if (uiManager.ShowEditor) {
+		GlobalSettings.Render();
+		fileExplorer.Render();
+		atlasExplorer.Render();
+		Log.Render();
+	    }
+	    if (uiManager.ShowStats) {
+		statsOverlay.Render();
 	    }
 
-            while (!Raylib.WindowShouldClose())
-            {
-                var total = 0;
-                while (total < 1000000) {
-                    total++;
-                }
+            rlImGui.End();
 
-                statsOverlay.RecordFrame(Raylib.GetFrameTime());
-		uiManager.HandleShortcuts();
-		textureExplorer.HandleInput();
+	    Raylib.EndDrawing();
+	}
 
-                Raylib.BeginDrawing();
-                Raylib.ClearBackground(Color.Beige);
+	rlImGui.Shutdown();
+	Raylib.CloseWindow();
+    }
 
-		var centerX = 10;
-		var centerY = 10;
-		var centerZ = 0;
+    static void RenderMap(IMap map)
+    {
+	int centerX = (int)GlobalSettings.CameraPosition.X;
+	int centerY = (int)GlobalSettings.CameraPosition.Y;
+	int centerZ = (int)GlobalSettings.CameraPosition.Z;
 
-		Camera3D camera = new Camera3D
-		{
-		    Position = new Vector3(centerX + 20, centerZ + 20, centerY + 20),
-		    Target = new Vector3(centerX, centerZ, centerY),
-		    Up = new Vector3(0, 1, 0),
-		    FovY = 45.0f,
-		    Projection = CameraProjection.Perspective
-		};
+	if (GlobalSettings.Use3D)
+	{
+	    Raylib.BeginMode3D(GlobalSettings.Camera);
+	    MapRenderer.Render3D(map, centerX - 10, centerY - 10, centerZ, 10, 1f);
+	    Raylib.EndMode3D();
+	}
+	else
+	{
+	    int width = Raylib.GetScreenWidth();
+	    int height = Raylib.GetScreenHeight();
 
-		Raylib.BeginMode3D(camera);
-		MapRenderer.Render3D(map, centerX, centerY, centerZ, 10, 1f);
-		Raylib.EndMode3D();
+	    MapRenderer.Render(map, centerX, centerY, 0, width, height, GlobalSettings.Scale);
+	}
+    }
 
-		Raylib.BeginMode3D(camera);
+    static IMap InitializeDummyMap() {
+	var map = new SparseMap();
 
-		MapRenderer.Render3D(map, 10, 10, 10, 40, 1f);
+	// Fill a small area with test voxels
+	var radius = 100;
+	for (int x = -radius; x <= radius; x++)
+	{
+	    for (int y = -radius; y <= radius; y++)
+	    {
+		string type;
+		int mod = (x + y) % 3;
+		if (mod == 0)
+		    type = "grass";
+		else if (mod == 1)
+		    type = "dirt";
+		else
+		    type = "water";
 
-		Raylib.EndMode3D();
-
-                rlImGui.Begin();
-
-		if (uiManager.ShowEditor) {
-		    textureExplorer.Render();
-                    atlasExplorer.Render();
-                }
-                Log.Render();
-                if (uiManager.ShowStats) {
-		    statsOverlay.Render();
-		}
-
-		rlImGui.End();
-
-		Raylib.EndDrawing();
-            }
-
-            rlImGui.Shutdown();
-            Raylib.CloseWindow();
-        }
+		map.Set(x, y, 0, new Voxel(type));
+	    }
+	}
+	return map;
     }
 }

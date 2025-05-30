@@ -14,6 +14,23 @@ namespace Editor
         private Texture2D? _texture = null;
         private bool _showPreview = true;
         private string? _lastLoadedPath = null;
+	private Dictionary<string, string> _editBuffer = new();
+	private bool _expandAll = false;
+	private string _nameFilter = "";
+        private int _visibleTiles = 0;
+
+        public void Save()
+	{
+	    if (_atlas == null || string.IsNullOrEmpty(_lastLoadedPath)) return;
+
+	    string json = JsonSerializer.Serialize(_atlas, new JsonSerializerOptions
+	    {
+		WriteIndented = true
+	    });
+
+	    File.WriteAllText(_lastLoadedPath, json);
+	    Log.Write("Atlas saved.");
+	}
 
 	public void Load(string atlasPath)
 	{
@@ -47,50 +64,96 @@ namespace Editor
 	}
 
 	public void Render()
-        {
-            if (_atlas == null || _texture == null)
-                return;
+	{
+	    if (_atlas == null || _texture == null)
+		return;
 
-            ImGui.Begin("Atlas Explorer");
+	    ImGui.Begin("Atlas Explorer");
+	    ImGui.InputText("Filter", ref _nameFilter, 64);
+	    ImGui.Text($"Texture: {_atlas.Texture}");
+	    ImGui.Text($"Tiles: ({_visibleTiles}/{_atlas.Sprites.Count})");
+	    ImGui.Checkbox("Show Preview", ref _showPreview);
+	    if (ImGui.Button("Save Atlas"))
+	    {
+		Save();
+	    }
 
-            ImGui.Text($"Texture: {_atlas.Texture}");
-            ImGui.Text($"Tiles: {_atlas.Sprites.Count}");
-            ImGui.Checkbox("Show Preview", ref _showPreview);
-            ImGui.Separator();
+            ImGui.SameLine();
 
-            ImGui.BeginChild("AtlasList");
+            if (ImGui.Button(_expandAll ? "Collapse All" : "Expand All"))
+	    {
+		_expandAll = !_expandAll;
+	    }
 
-            foreach (var sprite in _atlas.Sprites)
-            {
-                bool nodeOpen = ImGui.TreeNode(sprite.Name);
-                if (nodeOpen)
-                {
-                    ImGui.Text($"Position: ({sprite.X}, {sprite.Y})");
-                    ImGui.Text($"Size: {sprite.W}x{sprite.H}");
+	    ImGui.Separator();
 
-		    if (_showPreview)
-		    {
-			float scale = 2.0f;
-			int destWidth = (int)(sprite.W * scale);
-			int destHeight = (int)(sprite.H * scale);
+	    ImGui.BeginChild("AtlasList");
+            _visibleTiles = 0;
 
-                        var sourceRect = new Rectangle
-			{
-			    X = sprite.X,
-			    Y = sprite.Y,
-			    Width = sprite.W,
-			    Height = sprite.H
-			};
+	    for (int i = 0; i < _atlas.Sprites.Count; i++)
+	    {
 
-			rlImGui.ImageRect(_texture.Value, destWidth, destHeight, sourceRect);
-		    }
-
-                    ImGui.TreePop();
-                }
+                RenderTileInfo(i, _atlas.Sprites[i]);
             }
 
-            ImGui.EndChild();
-            ImGui.End();
-        }
+	    ImGui.EndChild();
+	    ImGui.End();
+	}
+
+	private void RenderTileInfo(int index, SpriteDef sprite)
+	{
+	    ImGui.PushID(index);
+
+	    if (!string.IsNullOrWhiteSpace(_nameFilter) &&
+		!sprite.Name.Contains(_nameFilter, StringComparison.OrdinalIgnoreCase))
+	    {
+		ImGui.PopID();
+		return;
+	    }
+            _visibleTiles = _visibleTiles + 1;
+
+            if (!_editBuffer.ContainsKey(sprite.Name))
+	    {
+		_editBuffer[sprite.Name] = sprite.Name;
+	    }
+
+	    string temp = _editBuffer[sprite.Name];
+	    if (ImGui.InputText("##Name", ref temp, 64))
+	    {
+		_editBuffer[sprite.Name] = temp;
+		sprite.Name = temp;
+	    }
+
+	    ImGui.SetNextItemOpen(_expandAll, ImGuiCond.Always);
+
+	    if (ImGui.TreeNode("Sprite Info"))
+	    {
+		ImGui.Text($"Position: ({sprite.X}, {sprite.Y})");
+		ImGui.Text($"Size: {sprite.W}x{sprite.H}");
+
+		if (_showPreview)
+		{
+		    float scale = 2.0f;
+		    int destWidth = (int)(sprite.W * scale);
+		    int destHeight = (int)(sprite.H * scale);
+
+		    var sourceRect = new Rectangle
+		    {
+			X = sprite.X,
+			Y = sprite.Y,
+			Width = sprite.W,
+			Height = sprite.H
+		    };
+
+		    rlImGui.ImageRect(_texture.Value, destWidth, destHeight, sourceRect);
+		}
+
+		ImGui.TreePop();
+	    }
+
+	    ImGui.PopID();
+	    ImGui.Separator();
+	}
+
     }
 }

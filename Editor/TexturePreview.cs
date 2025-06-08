@@ -48,7 +48,6 @@ namespace Editor
 
             if (!_isDragging && ImGui.IsMouseDown(ImGuiMouseButton.Left))
             {
-                Console.WriteLine("here?");
                 Log.Write("Mouse Down");
 
                 _isDragging = true;

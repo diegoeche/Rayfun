@@ -4,35 +4,35 @@
   "TileHeight": 16,
   "Sprites": [
     {
-      "Name": "tile_0_0",
+      "Name": "water_0_0",
       "X": 0,
       "Y": 0,
       "W": 16,
       "H": 16
     },
     {
-      "Name": "tile_1_0",
+      "Name": "water_1_0",
       "X": 16,
       "Y": 0,
       "W": 16,
       "H": 16
     },
     {
-      "Name": "tile_2_0",
+      "Name": "water_TL",
       "X": 32,
       "Y": 0,
       "W": 16,
       "H": 16
     },
     {
-      "Name": "tile_3_0",
+      "Name": "water_TM",
       "X": 48,
       "Y": 0,
       "W": 16,
       "H": 16
     },
     {
-      "Name": "tile_4_0",
+      "Name": "water_TR",
       "X": 64,
       "Y": 0,
       "W": 16,

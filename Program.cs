@@ -20,18 +20,26 @@ class Program
         var statsOverlay = new StatsOverlay();
         var atlasExplorer = new AtlasExplorer();
         var mapExplorer = new MapExplorer();
-
+	var gameAtlas = new GameAtlas();
+        gameAtlas.Load("./assets/assets.atlas.json");
+        Log.Write($"{gameAtlas.Get("assets:tile_5_5")}");
+        Log.Write(string.Join("\n", gameAtlas.ListSprites()));
+        // REMOVE ME.
         IMap map = InitializeDummyMap(); // <- generated map
+
+	var gameRenderer = new GameRenderer(gameAtlas);
 
         while (!Raylib.WindowShouldClose())
         {
-            statsOverlay.RecordFrame(Raylib.GetFrameTime());
+
+
+	    statsOverlay.RecordFrame(Raylib.GetFrameTime());
             uiManager.HandleShortcuts();
 
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Color.Beige);
 
-            RenderMap(map);
+            RenderMap(map, gameRenderer);
 
             rlImGui.Begin();
 
@@ -72,7 +80,7 @@ class Program
         Raylib.CloseWindow();
     }
 
-    static void RenderMap(IMap map)
+    static void RenderMap(IMap map, GameRenderer renderer)
     {
         int centerX = (int)GlobalSettings.CameraPosition.X;
         int centerY = (int)GlobalSettings.CameraPosition.Y;
@@ -88,8 +96,8 @@ class Program
         {
             int width = Raylib.GetScreenWidth();
             int height = Raylib.GetScreenHeight();
-
-            MapRenderer.Render(map, centerX, centerY, 0, width, height, GlobalSettings.Scale);
+	    renderer.Render(map, centerX, centerY, 0, width, height, GlobalSettings.Scale);
+            // MapRenderer.Render(map, centerX, centerY, 0, width, height, GlobalSettings.Scale);
         }
     }
 

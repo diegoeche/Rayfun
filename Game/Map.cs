@@ -58,11 +58,10 @@ namespace Game
 	    _atlas = atlas;
 	    _voxelToSpriteKey = new Dictionary<string, string>
 	    {
-		{ "grass", "assets.atlas:tile_0_0" },
-		{ "dirt", "assets.atlas:tile_0_1" },
-		{ "water", "assets.atlas:water_1_0" },
+		{ "grass", "assets.atlas:grass_5_0" },
+		{ "dirt", "assets.atlas:dirt_6_0" },
+		{ "water", "assets.atlas:water_0_0" },
 		{ "sword", "weapons:tile_0_0" }
-		// etc.
 	    };
 	}
 

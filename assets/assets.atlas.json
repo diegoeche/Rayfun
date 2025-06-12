@@ -123,28 +123,28 @@
       "H": 16
     },
     {
-      "Name": "tile_17_0",
+      "Name": "shop_sign_r",
       "X": 272,
       "Y": 0,
       "W": 16,
       "H": 16
     },
     {
-      "Name": "tile_18_0",
+      "Name": "shop_sign_l",
       "X": 288,
       "Y": 0,
       "W": 16,
       "H": 16
     },
     {
-      "Name": "tile_19_0",
+      "Name": "sign",
       "X": 304,
       "Y": 0,
       "W": 16,
       "H": 16
     },
     {
-      "Name": "tile_20_0",
+      "Name": "sign_left",
       "X": 320,
       "Y": 0,
       "W": 16,

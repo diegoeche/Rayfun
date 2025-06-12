@@ -23,6 +23,12 @@ namespace Editor
 
         public bool RequestedLoad { get; private set; } = false;
 
+	public string? FirstMap =>
+	    _mapFiles.Count > 0 ? _mapFiles[0] : null;
+
+	public string? LastMap =>
+	    _mapFiles.Count > 0 ? _mapFiles[^1] : null;
+
         public MapExplorer()
         {
             ReloadMapList();

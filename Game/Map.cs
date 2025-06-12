@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Raylib_cs;
 using System.Numerics;
+using Editor;
 
 namespace Game
 {
@@ -48,24 +49,20 @@ namespace Game
     }
 
 
+
     public class GameRenderer
     {
 	private readonly GameAtlas _atlas;
-	private readonly Dictionary<string, string> _voxelToSpriteKey;
+	private readonly Dictionary<string, VoxelMapping> _voxelMappings;
 
-	public GameRenderer(GameAtlas atlas)
+	public GameRenderer(GameAtlas atlas, Dictionary<string, VoxelMapping> voxelMappings)
 	{
 	    _atlas = atlas;
-	    _voxelToSpriteKey = new Dictionary<string, string>
-	    {
-		{ "grass", "assets.atlas:grass_5_0" },
-		{ "dirt", "assets.atlas:dirt_6_0" },
-		{ "water", "assets.atlas:water_0_0" },
-		{ "sword", "weapons:tile_0_0" }
-	    };
+	    _voxelMappings = voxelMappings;
 	}
 
-	public void Render(IMap map, int centerX, int centerY, int centerZ, int width, int height, float scale)
+
+	public void Render(IMap map, int centerX, int centerY, int centerZ, int width, int height, float scale, int depth = 4)
 	{
 	    int baseTileSize = 16;
 	    int tileSize = (int)(baseTileSize * scale);
@@ -74,33 +71,38 @@ namespace Game
 	    int radiusX = tilesX / 2;
 	    int radiusY = tilesY / 2;
 
-	    for (int dy = -radiusY; dy <= radiusY; dy++)
+	    for (int dz = 0; dz < depth; dz++)
 	    {
-		for (int dx = -radiusX; dx <= radiusX; dx++)
-		{
-		    int x = centerX + dx;
-		    int y = centerY + dy;
-		    var voxel = map.Get(x, y, centerZ);
-		    if (voxel == null) continue;
+		int z = centerZ + dz;
 
-		    if (_voxelToSpriteKey.TryGetValue(voxel.Type, out var spriteKey))
+		for (int dy = -radiusY; dy <= radiusY; dy++)
+		{
+		    for (int dx = -radiusX; dx <= radiusX; dx++)
 		    {
-			var sprite = _atlas.Get(spriteKey);
-			if (sprite != null)
+			int x = centerX + dx;
+			int y = centerY + dy;
+			var voxel = map.Get(x, y, z);
+			if (voxel == null) continue;
+
+			var screenX = (dx + radiusX) * tileSize;
+			var screenY = (dy + radiusY) * tileSize;
+
+			if (_voxelMappings.TryGetValue(voxel.Type, out var mapping) &&
+			    !string.IsNullOrEmpty(mapping.SpriteKey) &&
+			    _atlas.Get(mapping.SpriteKey) is { } sprite)
 			{
-			    var dest = new Rectangle((dx + radiusX) * tileSize, (dy + radiusY) * tileSize, tileSize, tileSize);
+			    var dest = new Rectangle(screenX, screenY, tileSize, tileSize);
 			    Raylib.DrawTexturePro(sprite.Texture, sprite.SourceRect, dest, Vector2.Zero, 0f, Color.White);
-			    continue;
+			}
+			else
+			{
+			    Raylib.DrawRectangle(screenX, screenY, tileSize, tileSize, Color.Magenta);
 			}
 		    }
-
-		    // fallback color
-		    Raylib.DrawRectangle((dx + radiusX) * tileSize, (dy + radiusY) * tileSize, tileSize, tileSize, Color.Magenta);
 		}
 	    }
 	}
     }
-
 
     public static class MapRenderer
     {

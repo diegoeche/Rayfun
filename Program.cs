@@ -20,19 +20,19 @@ class Program
         var statsOverlay = new StatsOverlay();
         var atlasExplorer = new AtlasExplorer();
         var mapExplorer = new MapExplorer();
-	var gameAtlas = new GameAtlas();
-        gameAtlas.Load("./assets/assets.atlas.json");
-        Log.Write($"{gameAtlas.Get("assets:tile_5_5")}");
-        Log.Write(string.Join("\n", gameAtlas.ListSprites()));
-        // REMOVE ME.
-        IMap map = InitializeDummyMap(); // <- generated map
+	var map = MapSerializer.Load(mapExplorer.LastMap);
 
-	var gameRenderer = new GameRenderer(gameAtlas);
+        var gameAtlas = new GameAtlas();
+        gameAtlas.Load("./assets/assets.atlas.json");
+        gameAtlas.Load("./assets/weapons.atlas.json");
+        gameAtlas.Load("./assets/bodies.atlas.json");
+
+        var voxelMapper = new VoxelSpriteMapper(gameAtlas);
+        voxelMapper.LoadFromFile();
+	var gameRenderer = new GameRenderer(gameAtlas, voxelMapper.GetMappings());
 
         while (!Raylib.WindowShouldClose())
         {
-
-
 	    statsOverlay.RecordFrame(Raylib.GetFrameTime());
             uiManager.HandleShortcuts();
 
@@ -49,6 +49,7 @@ class Program
                 fileExplorer.Render();
                 atlasExplorer.Render();
                 mapExplorer.Render(map);
+                voxelMapper.Render();
                 Log.Render();
 
                 if (mapExplorer.RequestedLoad && mapExplorer.SelectedMap != null)
@@ -97,30 +98,6 @@ class Program
             int width = Raylib.GetScreenWidth();
             int height = Raylib.GetScreenHeight();
 	    renderer.Render(map, centerX, centerY, 0, width, height, GlobalSettings.Scale);
-            // MapRenderer.Render(map, centerX, centerY, 0, width, height, GlobalSettings.Scale);
         }
-    }
-
-    static IMap InitializeDummyMap()
-    {
-        var map = new SparseMap();
-        int radius = 100;
-
-        for (int x = -radius; x <= radius; x++)
-        {
-            for (int y = -radius; y <= radius; y++)
-            {
-                string type = ((x + y) % 3) switch
-                {
-                    0 => "grass",
-                    1 => "dirt",
-                    _ => "water"
-                };
-
-                map.Set(x, y, 0, new Voxel(type));
-            }
-        }
-
-        return map;
     }
 }

@@ -22,6 +22,14 @@ public static class GlobalSettings
     public static float CameraFovY = DefaultFovY;
     public static CameraProjection CameraProjection = DefaultProjection;
 
+
+    public static bool ShowFileExplorer = true;
+    public static bool ShowStatsOverlay = true;
+    public static bool ShowMapExplorer = true;
+    public static bool ShowGameAtlas = true;
+    public static bool ShowVoxelMapper = true;
+    public static bool ShowLog = true;
+
     public static Camera3D Camera => new Camera3D
     {
         Position = CameraPosition,
@@ -73,6 +81,17 @@ public static class GlobalSettings
 	{
 	    ResetCamera();
 	}
+
+
+	ImGui.Separator();
+
+	ImGui.Text("UI Visibility");
+
+	ImGui.Checkbox("File Explorer", ref ShowFileExplorer);
+	ImGui.Checkbox("Voxel Mapper", ref ShowVoxelMapper);
+	ImGui.Checkbox("Map Explorer", ref ShowMapExplorer);
+	ImGui.Checkbox("Log", ref ShowLog);
+
 
 	ImGui.End();
     }

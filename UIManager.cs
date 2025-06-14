@@ -1,4 +1,3 @@
-using System;
 using Raylib_cs;
 
 public class UIManager
@@ -8,20 +7,20 @@ public class UIManager
 
     public void ToggleEditor()
     {
-	ShowEditor = !ShowEditor;
+        ShowEditor = !ShowEditor;
     }
 
     public void ToggleStats()
     {
-	ShowStats = !ShowStats;
+        ShowStats = !ShowStats;
     }
 
     public void HandleShortcuts()
     {
-	if (Raylib.IsKeyPressed(KeyboardKey.Tab))        // Toggle main UI
-	    ToggleEditor();
+        if (Raylib.IsKeyPressed(KeyboardKey.Tab))        // Toggle main UI
+            ToggleEditor();
 
-	if (Raylib.IsKeyPressed(KeyboardKey.F2))         // Toggle stats overlay
-	    ToggleStats();
+        if (Raylib.IsKeyPressed(KeyboardKey.F2))         // Toggle stats overlay
+            ToggleStats();
     }
 }

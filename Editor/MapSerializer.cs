@@ -36,7 +36,7 @@ namespace Editor
         {
             var json = File.ReadAllText(filePath);
             var voxels = JsonSerializer.Deserialize<List<SerializableVoxel>>(json) ?? new();
-
+            Log.Write($"Loading: {voxels.Count} voxels");
             var map = new SparseMap();
             foreach (var v in voxels)
             {

@@ -61,6 +61,24 @@ namespace Game
 	    _voxelMappings = voxelMappings;
 	}
 
+	public Vector2 ScreenPositionFor(int voxelX, int voxelY, int centerX, int centerY, int screenWidth, int screenHeight, float scale)
+	{
+	    int baseTileSize = 16;
+	    int tileSize = (int)(baseTileSize * scale);
+
+	    int tilesX = (int)Math.Ceiling(screenWidth / (float)tileSize);
+	    int tilesY = (int)Math.Ceiling(screenHeight / (float)tileSize);
+	    int radiusX = tilesX / 2;
+	    int radiusY = tilesY / 2;
+
+	    int dx = voxelX - centerX;
+	    int dy = voxelY - centerY;
+
+	    float screenX = (dx + radiusX) * tileSize;
+	    float screenY = (dy + radiusY) * tileSize;
+
+	    return new Vector2(screenX, screenY);
+	}
 
 	public void Render(IMap map, int centerX, int centerY, int centerZ, int width, int height, float scale, int depth = 4)
 	{
@@ -82,7 +100,7 @@ namespace Game
 			int x = centerX + dx;
 			int y = centerY + dy;
 			var voxel = map.Get(x, y, z);
-			if (voxel == null) continue;
+                        if (voxel == null) continue;
 
 			var screenX = (dx + radiusX) * tileSize;
 			var screenY = (dy + radiusY) * tileSize;
@@ -93,7 +111,8 @@ namespace Game
 			{
 			    var dest = new Rectangle(screenX, screenY, tileSize, tileSize);
 			    Raylib.DrawTexturePro(sprite.Texture, sprite.SourceRect, dest, Vector2.Zero, 0f, Color.White);
-			}
+                            Log.Write("Texture drawn");
+                        }
 			else
 			{
 			    Raylib.DrawRectangle(screenX, screenY, tileSize, tileSize, Color.Magenta);

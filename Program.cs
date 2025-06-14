@@ -8,6 +8,7 @@ using System.Numerics;
 
 class Program
 {
+
     static void Main(string[] args)
     {
         Raylib.SetConfigFlags(ConfigFlags.Msaa4xHint | ConfigFlags.VSyncHint | ConfigFlags.ResizableWindow);
@@ -15,25 +16,28 @@ class Program
         Raylib.SetTargetFPS(144);
         rlImGui.Setup(true);
 
-        var fileExplorer = new FileExplorer();
         var uiManager = new UIManager();
+
+        var fileExplorer = new FileExplorer();
         var statsOverlay = new StatsOverlay();
         var atlasExplorer = new AtlasExplorer();
         var mapExplorer = new MapExplorer();
-	var map = MapSerializer.Load(mapExplorer.LastMap);
-
         var gameAtlas = new GameAtlas();
         gameAtlas.Load("./assets/assets.atlas.json");
         gameAtlas.Load("./assets/weapons.atlas.json");
         gameAtlas.Load("./assets/bodies.atlas.json");
 
+        var map = MapSerializer.Load(mapExplorer.LastMap);
+
         var voxelMapper = new VoxelSpriteMapper(gameAtlas);
+
         voxelMapper.LoadFromFile();
-	var gameRenderer = new GameRenderer(gameAtlas, voxelMapper.GetMappings());
+
+        var gameRenderer = new GameRenderer(gameAtlas, voxelMapper.GetMappings());
 
         while (!Raylib.WindowShouldClose())
         {
-	    statsOverlay.RecordFrame(Raylib.GetFrameTime());
+            statsOverlay.RecordFrame(Raylib.GetFrameTime());
             uiManager.HandleShortcuts();
 
             Raylib.BeginDrawing();
@@ -46,11 +50,19 @@ class Program
             if (uiManager.ShowEditor)
             {
                 GlobalSettings.Render();
-                fileExplorer.Render();
                 atlasExplorer.Render();
-                mapExplorer.Render(map);
-                voxelMapper.Render();
-                Log.Render();
+
+                if (GlobalSettings.ShowFileExplorer)
+                    fileExplorer.Render();
+
+                if (GlobalSettings.ShowMapExplorer)
+		    mapExplorer.Render(map);
+
+                if (GlobalSettings.ShowVoxelMapper)
+                    voxelMapper.Render();
+
+                if (GlobalSettings.ShowLog)
+                    Log.Render();
 
                 if (mapExplorer.RequestedLoad && mapExplorer.SelectedMap != null)
                 {
@@ -85,7 +97,11 @@ class Program
     {
         int centerX = (int)GlobalSettings.CameraPosition.X;
         int centerY = (int)GlobalSettings.CameraPosition.Y;
-        int centerZ = (int)GlobalSettings.CameraPosition.Z;
+        int centerZ = 0;
+
+        int screenWidth = Raylib.GetScreenWidth();
+        int screenHeight = Raylib.GetScreenHeight();
+        float scale = GlobalSettings.Scale;
 
         if (GlobalSettings.Use3D)
         {
@@ -95,9 +111,30 @@ class Program
         }
         else
         {
-            int width = Raylib.GetScreenWidth();
-            int height = Raylib.GetScreenHeight();
-	    renderer.Render(map, centerX, centerY, 0, width, height, GlobalSettings.Scale);
+            Log.Write($"Rendering at: {centerX}, {centerY}");
+            renderer.Render(map, centerX, centerY, centerZ, screenWidth, screenHeight, scale, 4);
+
+            // Voxel selection highlight
+            Vector2 mousePos = Raylib.GetMousePosition();
+
+            // Reuse the same transform logic to find voxel under mouse
+            float tileSize = 16 * scale;
+            float offsetX = mousePos.X - screenWidth / 2f;
+            float offsetY = mousePos.Y - screenHeight / 2f;
+
+            int selectedVoxelX = (int)Math.Floor(centerX + offsetX / tileSize);
+            int selectedVoxelY = (int)Math.Floor(centerY + offsetY / tileSize);
+
+            // Get screen position of that voxel
+            Vector2 screenPos = renderer.ScreenPositionFor(
+		selectedVoxelX, selectedVoxelY,
+		centerX, centerY,
+		screenWidth, screenHeight,
+		scale
+            );
+
+            Color selectionColor = new Color(0, 255, 0, 128);
+            Raylib.DrawRectangle((int)screenPos.X, (int)screenPos.Y, (int)tileSize, (int)tileSize, selectionColor);
         }
     }
 }

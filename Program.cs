@@ -109,32 +109,47 @@ class Program
             MapRenderer.Render3D(map, centerX - 10, centerY - 10, centerZ, 10, 1f);
             Raylib.EndMode3D();
         }
-        else
-        {
-            Log.Write($"Rendering at: {centerX}, {centerY}");
-            renderer.Render(map, centerX, centerY, centerZ, screenWidth, screenHeight, scale, 4);
+	else
+	{
+	    renderer.Render(map, centerX, centerY, centerZ, screenWidth, screenHeight, scale, 4);
 
-            // Voxel selection highlight
-            Vector2 mousePos = Raylib.GetMousePosition();
+	    // Voxel selection highlight
+	    Vector2 mousePos = Raylib.GetMousePosition();
 
-            // Reuse the same transform logic to find voxel under mouse
-            float tileSize = 16 * scale;
-            float offsetX = mousePos.X - screenWidth / 2f;
-            float offsetY = mousePos.Y - screenHeight / 2f;
+	    // Check if ImGui is hovered
+	    if (!ImGui.GetIO().WantCaptureMouse && GlobalSettings.ShowTileInfo)
+	    {
+		// Reuse the same transform logic to find voxel under mouse
+		float tileSize = 16 * scale;
 
-            int selectedVoxelX = (int)Math.Floor(centerX + offsetX / tileSize);
-            int selectedVoxelY = (int)Math.Floor(centerY + offsetY / tileSize);
+		// Match how many tiles are visible
+		int tilesX = (int)Math.Ceiling(screenWidth / tileSize);
+		int tilesY = (int)Math.Ceiling(screenHeight / tileSize);
+		int radiusX = tilesX / 2;
+		int radiusY = tilesY / 2;
 
-            // Get screen position of that voxel
-            Vector2 screenPos = renderer.ScreenPositionFor(
-		selectedVoxelX, selectedVoxelY,
-		centerX, centerY,
-		screenWidth, screenHeight,
-		scale
-            );
+		// Get the pixel offset relative to top-left of the tile grid
+		float offsetX = mousePos.X;
+		float offsetY = mousePos.Y;
 
-            Color selectionColor = new Color(0, 255, 0, 128);
-            Raylib.DrawRectangle((int)screenPos.X, (int)screenPos.Y, (int)tileSize, (int)tileSize, selectionColor);
-        }
+		// Compute voxel dx/dy from that
+		int dx = (int)Math.Floor(offsetX / tileSize) - radiusX;
+		int dy = (int)Math.Floor(offsetY / tileSize) - radiusY;
+
+		int selectedVoxelX = centerX + dx;
+		int selectedVoxelY = centerY + dy;
+
+		// Get screen position of that voxel
+		Vector2 screenPos = renderer.ScreenPositionFor(
+		    selectedVoxelX, selectedVoxelY,
+		    centerX, centerY,
+		    screenWidth, screenHeight,
+		    scale
+		);
+
+		Color selectionColor = new Color(0, 255, 0, 128);
+		Raylib.DrawRectangle((int)screenPos.X, (int)screenPos.Y, (int)tileSize, (int)tileSize, selectionColor);
+	    }
+	}
     }
 }

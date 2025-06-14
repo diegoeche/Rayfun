@@ -111,7 +111,6 @@ namespace Game
 			{
 			    var dest = new Rectangle(screenX, screenY, tileSize, tileSize);
 			    Raylib.DrawTexturePro(sprite.Texture, sprite.SourceRect, dest, Vector2.Zero, 0f, Color.White);
-                            Log.Write("Texture drawn");
                         }
 			else
 			{

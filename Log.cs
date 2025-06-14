@@ -39,29 +39,48 @@ public static class Log
 
     public static void Render()
     {
-        ImGui.Begin("Log");
+	ImGui.Begin("Log");
 
-        ImGui.BeginChild("LogScroll", new System.Numerics.Vector2(0, 0), ImGuiChildFlags.None, ImGuiWindowFlags.HorizontalScrollbar);
+	// Start a horizontal bar
+	if (ImGui.BeginTable("LogTopBar", 2, ImGuiTableFlags.SizingStretchProp))
+	{
+	    ImGui.TableSetupColumn("Label", ImGuiTableColumnFlags.WidthStretch);
+	    ImGui.TableSetupColumn("Buttons", ImGuiTableColumnFlags.WidthFixed);
 
-        foreach (var entry in _entries)
-        {
-            ImGui.TextColored(new System.Numerics.Vector4(0.8f, 0.8f, 0.8f, 1.0f), $"[{entry.Timestamp}] {entry.Message}");
+	    ImGui.TableNextRow();
+	    ImGui.TableSetColumnIndex(0);
+	    ImGui.Text("Log Output");
 
-            if (entry.Count > 1)
-            {
-                // Place the counter on the right
-                float spacing = ImGui.GetContentRegionAvail().X;
-                ImGui.SameLine(spacing - 30);
-                ImGui.TextColored(new System.Numerics.Vector4(1.0f, 0.7f, 0.2f, 1.0f), $"×{entry.Count}");
-            }
-        }
+	    ImGui.TableSetColumnIndex(1);
+	    if (ImGui.Button("Clear"))
+	    {
+		_entries.Clear();
+	    }
 
-        if (_scrollToBottom && ImGui.GetScrollY() >= ImGui.GetScrollMaxY() - 10)
-            ImGui.SetScrollHereY(1.0f);
+	    ImGui.EndTable();
+	}
 
-        _scrollToBottom = false;
+	// Scrollable log area
+	ImGui.BeginChild("LogScroll", new System.Numerics.Vector2(0, 0), ImGuiChildFlags.None, ImGuiWindowFlags.HorizontalScrollbar);
 
-        ImGui.EndChild();
-        ImGui.End();
+	foreach (var entry in _entries)
+	{
+	    ImGui.TextColored(new System.Numerics.Vector4(0.8f, 0.8f, 0.8f, 1.0f), $"[{entry.Timestamp}] {entry.Message}");
+
+	    if (entry.Count > 1)
+	    {
+		float rightAlign = ImGui.GetCursorPosX() + ImGui.GetContentRegionAvail().X - 30;
+		ImGui.SameLine(rightAlign);
+		ImGui.TextColored(new System.Numerics.Vector4(1.0f, 0.7f, 0.2f, 1.0f), $"×{entry.Count}");
+	    }
+	}
+
+	if (_scrollToBottom && ImGui.GetScrollY() >= ImGui.GetScrollMaxY() - 10)
+	    ImGui.SetScrollHereY(1.0f);
+
+	_scrollToBottom = false;
+
+	ImGui.EndChild();
+	ImGui.End();
     }
 }

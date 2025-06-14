@@ -1,0 +1,26 @@
+{
+  "grass": {
+    "SpriteKey": "assets.atlas:grass_5_0",
+    "Strategy": 0
+  },
+  "dirt": {
+    "SpriteKey": "assets.atlas:dirt_6_0",
+    "Strategy": 0
+  },
+  "water": {
+    "SpriteKey": "assets.atlas:water_0_0",
+    "Strategy": 0
+  },
+  "sword": {
+    "SpriteKey": "",
+    "Strategy": 0
+  },
+  "sign_left": {
+    "SpriteKey": "assets.atlas:sign_left",
+    "Strategy": 0
+  },
+  "chicken": {
+    "SpriteKey": "assets.atlas:chicken_54_15",
+    "Strategy": 0
+  }
+}

@@ -8,7 +8,6 @@ using System.Numerics;
 
 class Program
 {
-
     static void Main(string[] args)
     {
         Raylib.SetConfigFlags(ConfigFlags.Msaa4xHint | ConfigFlags.VSyncHint | ConfigFlags.ResizableWindow);
@@ -34,6 +33,8 @@ class Program
         voxelMapper.LoadFromFile();
 
         var gameRenderer = new GameRenderer(gameAtlas, voxelMapper.GetMappings());
+        var tileInfoTool = new TileInfoOverlay(gameRenderer, map);
+        var copyTileAction = new CopyDragAction(map);
 
         while (!Raylib.WindowShouldClose())
         {
@@ -43,7 +44,7 @@ class Program
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Color.Beige);
 
-            RenderMap(map, gameRenderer);
+            RenderMap(map, gameRenderer, tileInfoTool);
 
             rlImGui.Begin();
 
@@ -93,7 +94,7 @@ class Program
         Raylib.CloseWindow();
     }
 
-    static void RenderMap(IMap map, GameRenderer renderer)
+    static void RenderMap(IMap map, GameRenderer renderer, ITileClickAction tileInfoTool)
     {
         int centerX = (int)GlobalSettings.CameraPosition.X;
         int centerY = (int)GlobalSettings.CameraPosition.Y;
@@ -113,43 +114,14 @@ class Program
 	{
 	    renderer.Render(map, centerX, centerY, centerZ, screenWidth, screenHeight, scale, 4);
 
-	    // Voxel selection highlight
-	    Vector2 mousePos = Raylib.GetMousePosition();
+	    ITileClickAction? activeTool = GlobalSettings.ClickToolType switch
+		{
+		    ClickToolType.TileInfo => tileInfoTool,
+		    // ClickToolType.CopyDrag => copy,
+		    _ => null
+		};
 
-	    // Check if ImGui is hovered
-	    if (!ImGui.GetIO().WantCaptureMouse && GlobalSettings.ShowTileInfo)
-	    {
-		// Reuse the same transform logic to find voxel under mouse
-		float tileSize = 16 * scale;
-
-		// Match how many tiles are visible
-		int tilesX = (int)Math.Ceiling(screenWidth / tileSize);
-		int tilesY = (int)Math.Ceiling(screenHeight / tileSize);
-		int radiusX = tilesX / 2;
-		int radiusY = tilesY / 2;
-
-		// Get the pixel offset relative to top-left of the tile grid
-		float offsetX = mousePos.X;
-		float offsetY = mousePos.Y;
-
-		// Compute voxel dx/dy from that
-		int dx = (int)Math.Floor(offsetX / tileSize) - radiusX;
-		int dy = (int)Math.Floor(offsetY / tileSize) - radiusY;
-
-		int selectedVoxelX = centerX + dx;
-		int selectedVoxelY = centerY + dy;
-
-		// Get screen position of that voxel
-		Vector2 screenPos = renderer.ScreenPositionFor(
-		    selectedVoxelX, selectedVoxelY,
-		    centerX, centerY,
-		    screenWidth, screenHeight,
-		    scale
-		);
-
-		Color selectionColor = new Color(0, 255, 0, 128);
-		Raylib.DrawRectangle((int)screenPos.X, (int)screenPos.Y, (int)tileSize, (int)tileSize, selectionColor);
-	    }
+	    TileSelector.HandleInteraction(renderer, map, activeTool);
 	}
     }
 }

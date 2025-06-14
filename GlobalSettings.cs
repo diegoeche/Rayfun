@@ -2,6 +2,15 @@ using System.Numerics;
 using ImGuiNET;
 using Raylib_cs;
 
+
+public enum ClickToolType
+{
+    None,
+    TileInfo,
+    CopyDrag
+    // You can add more later like PaintBrush, Erase, etc.
+}
+
 public static class GlobalSettings
 {
     public static bool Use3D = false;
@@ -30,6 +39,8 @@ public static class GlobalSettings
     public static bool ShowVoxelMapper = true;
     public static bool ShowLog = true;
     public static bool ShowTileInfo = true;
+
+    public static ClickToolType ClickToolType = ClickToolType.TileInfo;
 
     public static Camera3D Camera => new Camera3D
     {
@@ -96,7 +107,16 @@ public static class GlobalSettings
         ImGui.Checkbox("Log", ref ShowLog);
 
         ImGui.Separator();
+
         ImGui.Text("Map Editing Tools");
+
+	int toolIndex = (int)ClickToolType;
+
+	if (ImGui.Combo("Active Tool", ref toolIndex, "None\0Tile Info\0Copy Drag\0"))
+	{
+	    ClickToolType = (ClickToolType)toolIndex;
+
+	}
         ImGui.Checkbox("Show Tile Info", ref ShowTileInfo);
 
         ImGui.End();

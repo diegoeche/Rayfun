@@ -39,7 +39,7 @@ namespace Editor
             RequestedLoad = false;
         }
 
-        public void Render(IMap map)
+        public void Render(Ref<IMap> mapRef)
         {
             ImGui.Begin("Map Explorer");
 
@@ -61,7 +61,7 @@ namespace Editor
                 _showSaveAsModal = true;
             }
 
-            RenderModals(map);
+            RenderModals(mapRef.Value);
             ImGui.End();
         }
 

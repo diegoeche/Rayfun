@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using Raylib_cs;
-using rlImGui_cs;
 using ImGuiNET;
 using System.Numerics;
 using Game;
@@ -16,7 +14,7 @@ namespace Editor
 
     public static class TileSelector
     {
-        public static void HandleInteraction(GameRenderer renderer, IMap map, ITileClickAction? action)
+        public static void HandleInteraction(GameRenderer renderer, Ref<IMap> refMap, ITileClickAction? action)
         {
             if (action == null || ImGui.GetIO().WantCaptureMouse)
                 return;
@@ -59,12 +57,12 @@ namespace Editor
     public class TileInfoOverlay : ITileClickAction
     {
 	private readonly GameRenderer _renderer;
-	private readonly IMap _map;
+	private readonly Ref<IMap> _refMap;
 
-	public TileInfoOverlay(GameRenderer renderer, IMap map)
+	public TileInfoOverlay(GameRenderer renderer, Ref<IMap> refMap)
 	{
 	    _renderer = renderer;
-	    _map = map;
+	    _refMap = refMap;
 	}
 
 	public void OnTileHovered(int voxelX, int voxelY, Vector2 screenPos)
@@ -77,7 +75,7 @@ namespace Editor
 
 	public void OnTileClicked(int voxelX, int voxelY, Vector2 screenPos)
 	{
-	    var voxel = _map.Get(voxelX, voxelY, 0);
+	    var voxel = _refMap.Value.Get(voxelX, voxelY, 0);
 	    if (voxel != null)
 	    {
 		Log.Write($"({voxelX}, {voxelY}, 0) '{voxel.Type}' Voxel");
@@ -91,18 +89,18 @@ namespace Editor
 
     public class CopyDragAction : ITileClickAction
     {
-	private readonly IMap _map;
+	private readonly Ref<IMap> _refMap;
 	private string? _copiedType = null;
 	private bool _active = false;
 
-	public CopyDragAction(IMap map)
+	public CopyDragAction(Ref<IMap> refMap)
 	{
-	    _map = map;
+	    _refMap = refMap;
 	}
 
 	public void OnTileClicked(int voxelX, int voxelY, Vector2 screenPos)
 	{
-	    var voxel = _map.Get(voxelX, voxelY, 0);
+	    var voxel = _refMap.Value.Get(voxelX, voxelY, 0);
 	    if (voxel != null)
 	    {
 		_copiedType = voxel.Type;
@@ -121,7 +119,7 @@ namespace Editor
 	{
 	    if (_active && _copiedType != null && Raylib.IsMouseButtonDown(MouseButton.Left))
 	    {
-		_map.Set(voxelX, voxelY, 0, new Voxel(_copiedType));
+		_refMap.Value.Set(voxelX, voxelY, 0, new Voxel(_copiedType));
 	    }
 	    else if (!Raylib.IsMouseButtonDown(MouseButton.Left))
 	    {

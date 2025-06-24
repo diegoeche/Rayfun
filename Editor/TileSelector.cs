@@ -127,4 +127,44 @@ namespace Editor
 	    }
 	}
     }
+
+    public class PlaceAboveAction : ITileClickAction
+    {
+	private readonly Ref<IMap> _refMap;
+	private string _tileType;
+
+	public string TileType
+	{
+	    get { return _tileType; }
+	    set { _tileType = value; }
+	}
+
+	public PlaceAboveAction(Ref<IMap> refMap, string tileType)
+	{
+	    _refMap = refMap;
+	    _tileType = tileType;
+	}
+
+	public void OnTileClicked(int voxelX, int voxelY, Vector2 screenPos)
+	{
+	    for (int z = 4; z >= 0; z--)
+	    {
+		var existing = _refMap.Value.Get(voxelX, voxelY, z);
+		if (existing != null)
+		{
+		    int placeZ = z + 1;
+		    Log.Write($"Placing {_tileType} at ({voxelX}, {voxelY}, {placeZ}) above {existing.Type}");
+		    _refMap.Value.Set(voxelX, voxelY, placeZ, new Voxel(_tileType));
+		    return;
+		}
+	    }
+
+	    Log.Write("No base voxel found to place above.");
+	}
+
+	public void OnTileHovered(int voxelX, int voxelY, Vector2 screenPos)
+	{
+	    // Optional: implement hover-based placement/preview later
+	}
+    }
 }

@@ -22,5 +22,9 @@
   "chicken": {
     "SpriteKey": "assets.atlas:chicken_54_15",
     "Strategy": 0
+  },
+  "orc": {
+    "SpriteKey": "bodies.atlas:tile_0_7",
+    "Strategy": 0
   }
 }

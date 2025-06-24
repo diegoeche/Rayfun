@@ -7,7 +7,8 @@ public enum ClickToolType
 {
     None,
     TileInfo,
-    CopyDrag
+    CopyDrag,
+    AddVoxel
     // You can add more later like PaintBrush, Erase, etc.
 }
 
@@ -32,15 +33,19 @@ public static class GlobalSettings
     public static CameraProjection CameraProjection = DefaultProjection;
 
 
-    public static bool ShowFileExplorer = true;
+    public static bool ShowFileExplorer = false;
     public static bool ShowStatsOverlay = true;
-    public static bool ShowMapExplorer = true;
-    public static bool ShowGameAtlas = true;
-    public static bool ShowVoxelMapper = true;
+    public static bool ShowMapExplorer = false;
+    public static bool ShowGameAtlas = false;
+    public static bool ShowVoxelMapper = false;
+    public static bool ShowEntityEditor = false;
     public static bool ShowLog = true;
-    public static bool ShowTileInfo = true;
 
     public static ClickToolType ClickToolType = ClickToolType.TileInfo;
+    public static int CurrentVoxelIndex = 0;
+
+    // FIXME. Read from Map
+    public static string[] VOXEL_TYPES = { "orc", "chicken" };
 
     public static Camera3D Camera => new Camera3D
     {
@@ -50,6 +55,11 @@ public static class GlobalSettings
         FovY = CameraFovY,
         Projection = CameraProjection
     };
+
+    public static string SelectedVoxelName()
+    {
+	return VOXEL_TYPES[CurrentVoxelIndex];
+    }
 
     public static void Render()
     {
@@ -102,8 +112,9 @@ public static class GlobalSettings
         ImGui.Text("UI Visibility");
 
         ImGui.Checkbox("File Explorer", ref ShowFileExplorer);
-        ImGui.Checkbox("Voxel Mapper", ref ShowVoxelMapper);
         ImGui.Checkbox("Map Explorer", ref ShowMapExplorer);
+        ImGui.Checkbox("Entity Editor", ref ShowEntityEditor);
+        ImGui.Checkbox("Voxel Mapper", ref ShowVoxelMapper);
         ImGui.Checkbox("Log", ref ShowLog);
 
         ImGui.Separator();
@@ -112,12 +123,13 @@ public static class GlobalSettings
 
 	int toolIndex = (int)ClickToolType;
 
-	if (ImGui.Combo("Active Tool", ref toolIndex, "None\0Tile Info\0Copy Drag\0"))
+	if (ImGui.Combo("Active Tool", ref toolIndex, "None\0Tile Info\0Copy Drag\0Add Voxel\0"))
 	{
 	    ClickToolType = (ClickToolType)toolIndex;
-
 	}
-        ImGui.Checkbox("Show Tile Info", ref ShowTileInfo);
+	if ((ClickToolType)toolIndex == ClickToolType.AddVoxel) {
+	    ImGui.Combo("Voxel Type", ref CurrentVoxelIndex, VOXEL_TYPES, VOXEL_TYPES.Length);
+	}
 
         ImGui.End();
     }

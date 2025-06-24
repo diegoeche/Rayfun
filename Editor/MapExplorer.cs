@@ -15,6 +15,7 @@ namespace Editor
         private bool _showNewModal = false;
         private bool _showSaveAsModal = false;
         private string _filenameInput = "";
+        private bool _renderInNewWindow = true;
 
         public string? SelectedMap =>
             (_selectedIndex >= 0 && _selectedIndex < _mapFiles.Count)
@@ -29,8 +30,9 @@ namespace Editor
 	public string? LastMap =>
 	    _mapFiles.Count > 0 ? _mapFiles[^1] : null;
 
-        public MapExplorer()
+        public MapExplorer(bool _renderInNewWindow)
         {
+            this._renderInNewWindow = _renderInNewWindow;
             ReloadMapList();
         }
 
@@ -41,7 +43,10 @@ namespace Editor
 
         public void Render(Ref<IMap> mapRef)
         {
-            ImGui.Begin("Map Explorer");
+            if (_renderInNewWindow) {
+		ImGui.Begin("Map Explorer");
+	    }
+
 
             ImGui.InputText("Filter", ref _filter, 64);
             RenderMapList();
@@ -62,7 +67,10 @@ namespace Editor
             }
 
             RenderModals(mapRef.Value);
-            ImGui.End();
+
+            if (this._renderInNewWindow) {
+		ImGui.End();
+	    }
         }
 
         private void RenderMapList()
